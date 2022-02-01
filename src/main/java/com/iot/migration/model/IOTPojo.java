@@ -25,5 +25,7 @@ public class IOTPojo {
     private Long bankaKodu;
     private String tarih;
     private Integer aktarimDurumu;
+    private String bank;
+    private String servCatCode;
 
 }

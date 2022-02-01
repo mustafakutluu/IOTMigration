@@ -1,5 +1,6 @@
 package com.iot.migration.dao;
 
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import javax.sql.DataSource;
 import java.util.List;
@@ -13,14 +14,13 @@ public interface BaseDao {
      * @param params
      * @return List
      */
-    List<?> queryForOList(String sql, SqlParameterSource params);
+    List<?> queryForOList(String sql, SqlParameterSource params, RowMapper mapper);
 
     /**
      * @param sql
-     * @param params
      * @return int
      */
-    int count(String sql, Object[] params);
+    int count(String sql);
 
     /**
      * @param sql

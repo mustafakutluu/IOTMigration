@@ -1,6 +1,7 @@
 package com.iot.migration.dao;
 
 import com.iot.migration.constants.QueryConstants;
+import com.iot.migration.mapper.IOTMapper;
 import com.iot.migration.model.IOTPojo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,7 @@ public class I2IDaoImpl extends BaseDaoImpl implements I2IDao{
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("hesapNo", hesapNo);
 
-        return (List<IOTPojo>) queryForOList(QueryConstants.iotData, params);
+        return (List<IOTPojo>) queryForOList(QueryConstants.iotData, params, new IOTMapper());
 
     }
 

@@ -12,7 +12,6 @@ public class IOTMapper implements RowMapper<IOTPojo> {
         IOTPojo iotModel = new IOTPojo();
 
         iotModel.setAktarimDurumu(rs.getInt("aktarim_durumu"));
-        iotModel.setBankaKodu(rs.getLong("banka_kodu"));
         iotModel.setBayiKodu(rs.getString("bayi_kodu"));
         iotModel.setDistributorKodu(rs.getString("distributor_kodu"));
         iotModel.setFaturaDonemi(rs.getLong("fatura_donem"));
@@ -21,13 +20,13 @@ public class IOTMapper implements RowMapper<IOTPojo> {
         iotModel.setHesapNo(rs.getLong("hesap_no"));
         iotModel.setIMEI(rs.getString("IMEI"));
         iotModel.setKampanyaId(rs.getLong("kampanya_id"));
-        iotModel.setKDVOran(rs.getBigDecimal("KDV_Oran"));
         iotModel.setMSISDN(rs.getString("MSISDN"));
         iotModel.setMaliyeFaturaNo(rs.getString("maliye_fatura_no"));
-        iotModel.setOIVOran(rs.getBigDecimal("OIV_Oran"));
         iotModel.setSapGlCode(rs.getString("sap_GLCode"));
         iotModel.setTarih(rs.getString("tarih"));
         iotModel.setTutar(rs.getBigDecimal("tutar"));
+        iotModel.setBank(rs.getString("bank"));
+        iotModel.setServCatCode(rs.getString("servcat_code"));
 
         return iotModel;
     }
