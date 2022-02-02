@@ -25,17 +25,23 @@ public class AsyncConfiguration {
     @Value("${spring.iot.threadNamePrefix}")
     private String threadNamePrefix;
 
+    private ThreadPoolTaskExecutor executor;
+
 
     @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
         LOGGER.debug("Creating Async Task Executor");
-        final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(poolSize);
         executor.setMaxPoolSize(poolSize);
         executor.setQueueCapacity(queueCapacity);
         executor.setThreadNamePrefix(threadNamePrefix);
         executor.initialize();
         return executor;
+    }
+
+    public Integer getActiveThreadCount() {
+        return executor.getActiveCount();
     }
 
 }

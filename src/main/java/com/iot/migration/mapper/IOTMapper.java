@@ -27,6 +27,8 @@ public class IOTMapper implements RowMapper<IOTPojo> {
         iotModel.setTutar(rs.getBigDecimal("tutar"));
         iotModel.setBank(rs.getString("bank"));
         iotModel.setServCatCode(rs.getString("servcat_code"));
+        iotModel.setOtiSeqNo(rs.getLong("otseq"));
+        iotModel.setOtxAct(rs.getLong("otxact"));
 
         return iotModel;
     }

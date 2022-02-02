@@ -21,7 +21,7 @@ public class IOTDataSource {
         return iotDataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
     }
 
-    @Bean
+    /*@Bean
     @ConfigurationProperties("spring.datasource.i2i")
     public DataSourceProperties i2iDataSourceProperties() {
         return new DataSourceProperties();
@@ -31,5 +31,5 @@ public class IOTDataSource {
     @ConfigurationProperties("spring.datasource.i2i.configuration")
     public HikariDataSource i2iDataSource(DataSourceProperties i2iDataSourceProperties) {
         return i2iDataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
-    }
+    }*/
 }

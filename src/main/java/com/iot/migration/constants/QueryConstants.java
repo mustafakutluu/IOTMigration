@@ -3,11 +3,11 @@ package com.iot.migration.constants;
 public class QueryConstants {
 
     public static final String iotData = "select * from iot_mgr where hesap_no = :hesapNo";
-    public static final String iotInsert = "INSERT INTO IOT_MGR " +
+    public static final String iotInsert = "INSERT INTO IOT.IOT_MGR " +
             "(HESAP_NO, FATURA_NO, MALIYE_FATURA_NO, FATURA_GONDERIM_TIPI, FATURA_DONEM, MSISDN, TUTAR, KDV_ORAN, OIV_ORAN, BAYI_KODU, KAMPANYA_ID, IMEI, SAP_GLCODE, DISTRIBUTOR_KODU, BANKA_KODU, TARIH, AKTARIM_DURUMU) " +
             "VALUES(:hesapNo, :faturaNo, :maliyeFaturaNo, :faturaGonderimTipi, :faturaDonemi, :MSISDN, :tutar, :KDVOran, :OIVOran, :bayiKodu, :kampanyaId, :IMEI, :sapGlCode, :distributorKodu, :bankaKodu, :tarih, :aktarimDurumu)";
     public static final String iotBank = "SELECT * FROM BANK_CODE";
-    public static final String iotTaxCategories = "SELECT TGPV.SERVCAT_CODE||'~'||TGPV.SERV_CODE||'~'||TGPV.SERV_TYPE ID, TAXCAT_NAME , TRV.TAXCAT_ID, TRV.TAXRATE "
+    public static final String iotTaxCategories = "SELECT distinct TGPV.SERVCAT_CODE, TAXCAT_NAME , TRV.TAXCAT_ID, TRV.TAXRATE "
             + "FROM TAX_GROUP_PACKAGE_VIEW TGPV, TAX_REFERENCE_VIEW TRV "
             + "WHERE TRV.INVALID_FROM > SYSDATE "
             + "AND TRV.TAX_GROUP_ID = TGPV.TAX_GROUP_ID "
@@ -16,10 +16,14 @@ public class QueryConstants {
     public static final String countQueryPrefix = "select count(1) from ( ";
     public static final String countQuerySuffix = " )";
 
-    public static final String limitOffsetPrefix = "select T.* from( ";
-    public static final String limitOffsetSuffix = " ) T WHERE rownum BETWEEN :start AND :finish";
+    public static final String limitOffsetPrefix = "SELECT * from( " +
+            "SELECT /*+ FIRST_ROWS(n) */ T.*, rownum rn from( ";
+    public static final String limitOffsetSuffix = " ) T WHERE rownum <= :finish) " +
+            "WHERE rn >= :start ";
 
     public static final String migrationData = "SELECT /*+ PARALLEL(10)*/ " +
+            "O.OTSEQ, " +
+            "O.OTXACT, " +
             "OA.CUSTOMER_ID HESAP_NO, " +
             "OA.OHREFNUM FATURA_NO, " +
             "MCH.FATURA_ID MALIYE_FATURA_NO, " +
@@ -33,7 +37,9 @@ public class QueryConstants {
             "O.OTGLSALE SAP_GLCODE, " +
             "S.DISTRIBUTOR DISTRIBUTOR_KODU, " +
             "TO_CHAR(SYSDATE,'DD.MM.YYYY') TARIH, " +
-            "0 AKTARIM_DURUMU " +
+            "0 AKTARIM_DURUMU, " +
+            "S.BANK, " +
+            "O.SERVCAT_CODE " +
             "FROM ORDERTRAILER O " +
             "JOIN ORDERHDR_ALL OA  ON OA.OHXACT = O.OTXACT " +
             "LEFT JOIN CONTRACT_ALL CA ON CA.CUSTOMER_ID=OA.CUSTOMER_ID  " +
@@ -43,6 +49,8 @@ public class QueryConstants {
             "WHERE OTMERCH_GL <> 0 " +
             "UNION ALL " +
             "SELECT /*+ PARALLEL(10)*/ " +
+            "OI.OTI_SEQNO OTSEQ ," +
+            "OI.OTXACT ," +
             "OA.CUSTOMER_ID HESAP_NO, " +
             "OA.OHREFNUM FATURA_NO, " +
             "MCH.FATURA_ID MALIYE_FATURA_NO, " +
@@ -56,11 +64,13 @@ public class QueryConstants {
             "OI.GLACODE SAP_GLCODE, " +
             "NULL DISTRIBUTOR_KODU, " +
             "TO_CHAR(SYSDATE,'DD.MM.YYYY') TARIH, " +
-            "0 AKTARIM_DURUMU " +
+            "0 AKTARIM_DURUMU, " +
+            "NULL SERVCAT_CODE, " +
+            "NULL BANK " +
             "FROM ORDERTAX_ITEMS OI " +
             "JOIN ORDERHDR_ALL OA  ON OA.OHXACT =OI.OTXACT " +
             "LEFT OUTER JOIN CUSTOMER_ALL CAL ON CAL.CUSTOMER_ID = OA.CUSTOMER_ID  " +
             "LEFT OUTER JOIN EU_BILL.MALIYE_COUNTER_HISTORY MCH ON MCH.CUSTCODE = CAL.CUSTCODE AND MCH.CUTOFF =OA.OHENTDATE " +
-            "WHERE TAXAMT_GL <> 0";
+            "WHERE TAXAMT_GL <> 0 ORDER BY OTSEQ, OTXACT, SAP_GLCODE ASC ";
 
 }
