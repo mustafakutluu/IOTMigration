@@ -4,6 +4,7 @@ import com.iot.migration.configuration.AsyncConfiguration;
 import com.iot.migration.constants.QueryConstants;
 import com.iot.migration.dao.I2IDaoImpl;
 import com.iot.migration.dao.IOTDaoImpl;
+import com.iot.migration.exception.ChunkSizeException;
 import com.iot.migration.model.Bank;
 import com.iot.migration.model.TaxCategory;
 import org.slf4j.Logger;
@@ -46,7 +47,12 @@ public class MigrationService{
     @Autowired
     private DataSource i2iDataSource;
 
-    public void migrate () throws InterruptedException {
+    /*
+    thread lerden birini uyutup future join de tüm threadleri beklemesini test et
+    per4j ekle
+     */
+
+    public void migrate () throws InterruptedException, ChunkSizeException {
 
         Map<String, Long> bankMap = null;
         Map<String, BigDecimal> kdvMap = null;
@@ -55,6 +61,13 @@ public class MigrationService{
         List<CompletableFuture<Boolean>> futureList;
 
         iotDao.setDataSource(iotDataSource);
+
+        int migrationDataCount = iotDao.count(QueryConstants.migrationData);
+
+        if(migrationDataCount < poolSize) {
+            logger.error("Data count is less than pool size. Data count: " + migrationDataCount + ", Pool size: " + poolSize);
+            throw new ChunkSizeException("Data count cannot be less than thread pool size!");
+        }
 
         List<Bank> bankList = iotDao.getBankData();
 
@@ -71,9 +84,6 @@ public class MigrationService{
             oivMap = taxCategoryList.stream().filter(e -> e.getTaxCatName().startsWith("Special"))
                     .collect(Collectors.toMap(TaxCategory::getServCatCode, TaxCategory::getTaxRate));
         }
-
-        int migrationDataCount = 0;
-        migrationDataCount = iotDao.count(QueryConstants.migrationData);
 
         if(migrationDataCount > 0) {
 
@@ -92,7 +102,7 @@ public class MigrationService{
                 CompletableFuture<Boolean> feature= processor.process(bankMap, kdvMap, oivMap, start, finish, iotDao);
                 futureList.add(feature);
 
-                logger.debug("Number of currently active threads: " + threadPoolTaskExecutor.getActiveThreadCount());
+                logger.info("Number of currently active threads: " + threadPoolTaskExecutor.getActiveThreadCount());
 
                 start = (threadDataCounts.get("chunkSize")*i) + 1;
                 finish = threadDataCounts.get("chunkSize") * (i+1);
@@ -103,9 +113,9 @@ public class MigrationService{
             if (!futureList.isEmpty()) {
                 try {
                     CompletableFuture.allOf(futureList.toArray(new CompletableFuture<?>[0])).join();
-                    logger.debug("Number of currently active threads after finish: " + threadPoolTaskExecutor.getActiveThreadCount());
+                    logger.info("Number of currently active threads after finish: " + threadPoolTaskExecutor.getActiveThreadCount());
                 } catch (CompletionException e) {
-                    logger.debug("insertion failed!!!!");
+                    logger.info("insertion failed!!!!");
                     e.printStackTrace();
                 }
             }
@@ -115,13 +125,11 @@ public class MigrationService{
     private Map<String, Integer> calculateDataChunkSize(int dataCount){
 
         int threadDataCount = dataCount/poolSize;
-
         int totalDataRemainderCount = dataCount - (threadDataCount*poolSize);
 
         Map<String, Integer> countResult = new HashMap<>();
         countResult.put("chunkSize", threadDataCount);
         countResult.put("dataRemainderCount", totalDataRemainderCount);
-
 
         return countResult;
     }
