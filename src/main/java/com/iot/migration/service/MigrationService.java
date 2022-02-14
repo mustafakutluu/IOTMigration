@@ -47,11 +47,6 @@ public class MigrationService{
     @Autowired
     private DataSource i2iDataSource;
 
-    /*
-    thread lerden birini uyutup future join de tüm threadleri beklemesini test et
-    per4j ekle
-     */
-
     public void migrate () throws InterruptedException, ChunkSizeException {
 
         Map<String, Long> bankMap = null;
