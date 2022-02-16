@@ -1,6 +1,7 @@
 package com.iot.migration.service;
 
 import com.iot.migration.configuration.AsyncConfiguration;
+import com.iot.migration.configuration.LogExecutionTime;
 import com.iot.migration.constants.QueryConstants;
 import com.iot.migration.dao.I2IDaoImpl;
 import com.iot.migration.dao.IOTDaoImpl;
@@ -47,11 +48,7 @@ public class MigrationService{
     @Autowired
     private DataSource i2iDataSource;
 
-    /*
-    thread lerden birini uyutup future join de tüm threadleri beklemesini test et
-    per4j ekle
-     */
-
+    @LogExecutionTime
     public void migrate () throws InterruptedException, ChunkSizeException {
 
         Map<String, Long> bankMap = null;

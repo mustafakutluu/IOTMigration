@@ -1,5 +1,6 @@
 package com.iot.migration.dao;
 
+import com.iot.migration.configuration.LogExecutionTime;
 import com.iot.migration.constants.QueryConstants;
 import com.iot.migration.mapper.IOTMapper;
 import com.iot.migration.model.IOTPojo;
@@ -14,7 +15,8 @@ public class I2IDaoImpl extends BaseDaoImpl implements I2IDao{
 
     private static Logger logger = LoggerFactory.getLogger(I2IDaoImpl.class);
 
-  @Override
+    @Override
+    @LogExecutionTime
     public List<IOTPojo> getMigrationData(Long hesapNo) {
 
         MapSqlParameterSource params = new MapSqlParameterSource();
@@ -25,6 +27,7 @@ public class I2IDaoImpl extends BaseDaoImpl implements I2IDao{
     }
 
     @Override
+    @LogExecutionTime
     public IOTPojo insert(IOTPojo param) {
 
         int queryResult = insert(QueryConstants.iotInsert, param);
@@ -32,6 +35,7 @@ public class I2IDaoImpl extends BaseDaoImpl implements I2IDao{
     }
 
     @Override
+    @LogExecutionTime
     public List<IOTPojo> batchInsert(List<IOTPojo> params) {
 
         int[] resultArray = batchInsert(QueryConstants.iotInsert, params);

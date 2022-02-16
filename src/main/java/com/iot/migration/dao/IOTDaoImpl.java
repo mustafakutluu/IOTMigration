@@ -1,5 +1,6 @@
 package com.iot.migration.dao;
 
+import com.iot.migration.configuration.LogExecutionTime;
 import com.iot.migration.constants.QueryConstants;
 import com.iot.migration.mapper.BankMapper;
 import com.iot.migration.mapper.IOTMapper;
@@ -19,18 +20,21 @@ public class IOTDaoImpl extends BaseDaoImpl implements IOTDao {
     private static final Logger logger = LoggerFactory.getLogger(IOTDaoImpl.class);
 
     @Override
+    @LogExecutionTime
     public List<Bank> getBankData() {
 
         return (List<Bank>) queryForOList(QueryConstants.iotBank, new MapSqlParameterSource(), new BankMapper());
     }
 
     @Override
+    @LogExecutionTime
     public List<TaxCategory> getTaxCategoryData() {
 
         return (List<TaxCategory>) queryForOList(QueryConstants.iotTaxCategories, new MapSqlParameterSource(), new TaxCategoryMapper());
     }
 
     @Override
+    @LogExecutionTime
     public List<IOTPojo> getMigrationData(int start, int finish) {
 
         StringBuilder queryStringBuilder = new StringBuilder(QueryConstants.limitOffsetPrefix).append(QueryConstants.migrationData).append(QueryConstants.limitOffsetSuffix);
