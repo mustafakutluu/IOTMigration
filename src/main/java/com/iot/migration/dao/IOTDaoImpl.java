@@ -47,12 +47,14 @@ public class IOTDaoImpl extends BaseDaoImpl implements IOTDao {
     }
 
     @Override
+    @LogExecutionTime
     public IOTPojo insert(IOTPojo param) {
         int queryResult = insert(QueryConstants.iotInsert, param);
         return queryResult == 1 ? param : null;
     }
 
     @Override
+    @LogExecutionTime
     public List<IOTPojo> batchInsert(List<IOTPojo> params) {
 
         int[] resultArray = batchInsert(QueryConstants.iotInsert, params);
